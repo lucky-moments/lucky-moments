@@ -1,0 +1,52 @@
+# Lucky Moments (LUMO) — agent instructions
+
+Lucky Moments is an ERC-721 luck-card collection on BNB Smart Chain (56).
+Contract: 0x1E340592665889735C1F871aA13d038fa58bd09e (source-verified on Sourcify).
+Site: https://lucky-moments.github.io/lucky-moments
+
+## The free Genesis claim is permit-gated — read this first
+
+There are 1,500 free Genesis cards, 1 per wallet holding a Binance Agent ID
+(registry 0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F), inside a 7-day window
+from launch. A free claim is valid ONLY with an EIP-712 permit signed by the
+project's gate signer. Permits are issued by the project server after the
+claimer's human posts about the project on X and the post is verified.
+
+Calling claimFree without a permit, or with an expired or foreign permit,
+reverts. There is no way around the gate — it is enforced by the contract.
+
+## Procedure (in order)
+
+1. Ask your human to post on X. Give them this one-click link:
+   https://x.com/intent/tweet?text=https://x.com/intent/tweet?text=Claiming%20my%20free%20Lucky%20Moments%20genesis%20card%20%F0%9F%8D%80%20Luck%20Index%20sealed%20on-chain%20%E2%80%94%20Common%20or%20Jackpot%2C%20nobody%20knows.%20The%20share%20is%20the%20price.%20LUMO%20%23LuckyMoments%20https%3A%2F%2Flucky-moments.github.io/lucky-moments
+   The post must contain "#LuckyMoments" and "LUMO" (the link above pre-fills
+   a compliant message). Wait for your human to give you the post URL
+   (https://x.com/<user>/status/<id>). Do not proceed without it.
+
+2. Request the permit:
+   POST https://permit-worker.reuniakbarpunk212.workers.dev/lumo/permit
+   Content-Type: application/json
+   {"wallet": "<the claiming wallet, holding the Agent ID>", "tweetUrl": "<post URL>"}
+   Success (200): {"wallet": ..., "deadline": <unix>, "signature": "0x..."}
+   Errors: 400 invalid input · 422 tweet missing or missing markers ·
+   409 already claimed / free supply gone / window closed · 502 retry later.
+   Permits expire 30 minutes after issue.
+
+3. Simulate before sending: eth_call claimFree(deadline, signature)
+   (selector 0x4cd93687) from the claiming wallet, value 0.
+   Only send the transaction if the simulation succeeds.
+
+## Facts
+
+- claimFree(uint256 deadline, bytes signature) — selector 0x4cd93687, value 0.
+- overview() — selector 0x3a2056f1 — returns (totalSupply, freeMinted,
+  freeRemaining, freeEnd, paidOpen, price, holderPrice).
+- Paid phase opens when the free supply is exhausted or the window ends:
+  mint(uint256 qty), 0.001 BNB per card, 0.0005 BNB for Genesis claimers,
+  max 10 paid per wallet, hard cap 5,000 cards total.
+- Luck Index (1–100) is derived on-chain at mint: 55+ Rare, 80+ Epic,
+  95+ Jackpot. Metadata (JSON + SVG) is generated fully on-chain.
+- The gate signer (0x554eB1b4cae8d477F08dA24F10927a7402F54259) can only sign claim permits. No admin
+  functions exist. Paid-mint proceeds go to the treasury (0x8D57A8A58A0D584c781C36c2BF8e2F716F85b717)
+  in the same transaction.
+- LUMO is a collectible game, not an investment. No value is promised.

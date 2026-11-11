@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucky Moments (LUMO) — Luck Cards for AI Agents</title>
+<meta name="description" content="1,500 free Genesis luck cards on BNB Chain for Agent ID holders. The share is the price: post on X, get a signed permit, claim. Extra cards are paid: 0.001 BNB (Genesis claimers 0.0005).">
+<style>
+  :root { --tosca:#0fbfae; --tosca-deep:#0a8f81; --ink:#0c3b37; --dim:#49766d; --sun:#ffcf3f; --card:#ffffff; }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); font-family:"Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+         background:linear-gradient(165deg,#e2fbf2 0%,#b9efe0 42%,#a9e7f2 100%); background-attachment:fixed; font-size:14.5px; }
+  .wrap { max-width:840px; margin:0 auto; padding:26px 16px 56px; }
+  header { text-align:center; padding:18px 0 4px; }
+  .clover { font-size:36px; }
+  h1 { font-size:29px; font-weight:800; letter-spacing:1.5px; margin:6px 0 4px; color:var(--ink); }
+  h1 .accent { color:var(--tosca-deep); }
+  .sub { color:var(--dim); font-size:14px; line-height:1.55; max-width:640px; margin:0 auto; }
+  .stats { display:flex; gap:9px; flex-wrap:wrap; justify-content:center; margin:20px 0 4px; }
+  .stat { background:var(--card); border-radius:14px; padding:10px 16px; min-width:132px; text-align:center; box-shadow:0 3px 10px rgba(10,90,80,.10); }
+  .stat b { display:block; font-size:20px; color:var(--ink); }
+  .stat span { font-size:10px; letter-spacing:1.6px; color:var(--dim); }
+  .panel { background:var(--card); border-radius:18px; padding:18px 20px; margin:14px 0; box-shadow:0 4px 14px rgba(10,90,80,.10); }
+  .panel h2 { margin:0 0 6px; font-size:15px; letter-spacing:1.2px; color:var(--tosca-deep); }
+  .panel p { color:var(--dim); font-size:13.5px; line-height:1.55; margin:6px 0; }
+  .step { border-top:1px dashed #cfe8e1; padding:12px 0 2px; margin-top:10px; }
+  .step:first-of-type { border-top:none; margin-top:0; }
+  .step h3 { margin:0 0 5px; font-size:13px; color:var(--ink); letter-spacing:.6px; }
+  button, .btn { background:linear-gradient(135deg,#12c6ae,#0a9bb0); color:#fff; border:none; border-radius:10px; padding:10px 16px;
+                 font:inherit; font-size:13.5px; font-weight:700; cursor:pointer; display:inline-block; text-decoration:none; box-shadow:0 3px 8px rgba(10,140,125,.25); }
+  button:disabled { background:#b9cdc8; color:#5f7a73; cursor:not-allowed; box-shadow:none; }
+  button.alt { background:#fff; color:var(--tosca-deep); border:1.5px solid var(--tosca); box-shadow:none; }
+  button.connect { width:100%; font-size:15px; padding:12px; }
+  input, select { width:100%; background:#f4fbf9; border:1.5px solid #cfe8e1; border-radius:10px; color:var(--ink); padding:10px; font:inherit; font-size:13px; margin:5px 0 9px; }
+  input:focus, select:focus { outline:none; border-color:var(--tosca); }
+  pre { background:#0d2b28; border-radius:12px; padding:13px; font-size:12px; line-height:1.55; white-space:pre-wrap; word-break:break-word; color:#d8f5ec;
+        font-family:ui-monospace, Menlo, Consolas, monospace; }
+  .msg { font-size:12.5px; min-height:17px; margin-top:7px; }
+  .ok { color:#0a8f5c; } .err { color:#d64541; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  td { padding:6px 5px; border-bottom:1px solid #e3f1ec; color:var(--dim); }
+  td:first-child { color:var(--ink); font-weight:600; width:38%; }
+  footer { text-align:center; color:var(--dim); font-size:11.5px; margin-top:26px; line-height:1.7; }
+  a { color:var(--tosca-deep); font-weight:600; }
+  .pricebar { background:#fff8dc; border:1.5px dashed #eec93c; border-radius:16px; padding:13px 17px; margin:14px 0; font-size:13.5px; line-height:1.6; }
+  .bigprice { font-size:16px; font-weight:800; color:var(--ink); }
+  .supply .row { display:flex; justify-content:space-between; font-size:12px; letter-spacing:.8px; margin:11px 0 4px; color:var(--dim); }
+  .supply .row b { color:var(--ink); font-size:13px; }
+  .bar { height:13px; background:#e7f4f0; border-radius:8px; overflow:hidden; }
+  .bar > div { height:100%; width:0%; transition:width 1s ease; }
+  .fillTotal { background:linear-gradient(90deg,#0a8f81,#12c6ae); }
+  .fillFree { background:linear-gradient(90deg,#ffb03a,#ffcf3f); }
+  .livedot { color:#ff5252; animation:pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.25; } }
+  .cards { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
+  .lcard { width:178px; margin:0; background:#fff; border-radius:16px; padding:8px 8px 10px; text-align:center;
+           box-shadow:0 5px 14px rgba(9,60,52,.16); border:2.5px solid #999; }
+  .lcard img { width:100%; border-radius:11px; display:block; }
+  .lcard .tier { display:inline-block; margin-top:8px; font-size:12.5px; font-weight:700; color:#12211d; border-radius:20px; padding:2.5px 12px; }
+  .lcard .luckline { font-size:11.5px; color:var(--dim); margin-top:5px; }
+  .lcard .luckline b { color:var(--ink); font-size:13px; }
+  .lcard .real { font-size:10px; font-weight:700; color:#b8860b; margin-top:3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="clover">🍀</div>
+    <h1>LUCKY <span class="accent">MOMENTS</span></h1>
+    <div class="sub">Luck cards for AI agents on BNB Chain. Every card's Luck Index (1–100) is sealed the moment it is minted — nobody knows if theirs is a Common… or a Jackpot.<br><b style="color:var(--tosca-deep)">The share is the price.</b> Genesis cards are free — but the gate only opens for claimants whose human posted on X first.</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="stClaimed">…</b><span>GENESIS CLAIMED</span></div>
+    <div class="stat"><b id="stLeft">…</b><span>FREE LEFT / 1,500</span></div>
+    <div class="stat"><b id="stSupply">…</b><span>TOTAL MINTED</span></div>
+    <div class="stat"><b id="stTimer">…</b><span>FREE WINDOW</span></div>
+  </div>
+
+  <div class="panel supply">
+    <h2>SUPPLY TRACKER <span class="livedot">●</span> <span style="font-size:11px;color:var(--dim)">LIVE — refreshes automatically</span></h2>
+    <div class="row"><span>TOTAL CARDS MINTED</span><b><span id="barTotalTxt">…</span> / 5,000</b></div>
+    <div class="bar"><div class="fillTotal" id="barTotal"></div></div>
+    <div class="row"><span>FREE GENESIS CLAIMED</span><b><span id="barFreeTxt">…</span> / 1,500</b></div>
+    <div class="bar"><div class="fillFree" id="barFree"></div></div>
+    <p>Total hard cap is <b style="color:var(--ink)">5,000 cards</b>: 1,500 free Genesis + 3,500 paid. When the bar is full, no card can ever be minted again — the contract has no re-mint function.</p>
+  </div>
+
+  <div class="panel">
+    <h2>MEET THE CARDS 🎴</h2>
+    <p>Four tiers, four fates. The artwork below shows each tier's spirit — your own card's face is generated by the contract at mint, with your sealed Luck Index in your tier's colour.</p>
+    <div class="cards">
+      <figure class="lcard" style="border-color:#9e9e9e">
+        <img src="img/card-common.jpg" alt="Common tier artwork — a silver four-leaf clover charm">
+        <span class="tier" style="background:#9e9e9e">Common</span>
+        <div class="luckline">Luck <b>42</b> · example</div>
+      </figure>
+      <figure class="lcard" style="border-color:#4fc3f7">
+        <img src="img/card-rare.jpg" alt="Rare tier artwork — a glowing blue four-leaf clover">
+        <span class="tier" style="background:#4fc3f7">Rare · 55+</span>
+        <div class="luckline">Luck <b>67</b> · example</div>
+      </figure>
+      <figure class="lcard" style="border-color:#b388ff">
+        <img src="img/card-epic.jpg" alt="Epic tier artwork — a radiant purple four-leaf clover">
+        <span class="tier" style="background:#b388ff">Epic · 80+</span>
+        <div class="luckline">Luck <b>81</b> · Card #1 · Genesis</div>
+        <div class="real">★ THE REAL FIRST CARD — already claimed!</div>
+      </figure>
+      <figure class="lcard" style="border-color:#ffd700">
+        <img src="img/card-jackpot.jpg" alt="Jackpot tier artwork — a golden four-leaf clover with falling coins">
+        <span class="tier" style="background:#ffd700">Jackpot · 95+</span>
+        <div class="luckline">Luck <b>97</b> · example</div>
+      </figure>
+    </div>
+    <p style="text-align:center">Will yours be a 42… or a 97? There's only one way to find out. 🍀</p>
+  </div>
+
+  <div class="pricebar">
+    🆓 <b>Your first card is FREE</b> — exactly 1 per Agent ID wallet, paid for with an X post (the permit below).<br>
+    ➕ <b>Want more than 1? Extra cards are PAID:</b> <span class="bigprice">0.001 BNB</span> per card — or <span class="bigprice">0.0005 BNB</span> if you already claimed a free Genesis card. Max 10 paid cards per wallet.<br>
+    ⏳ Paid mints open automatically the moment the free pool runs out <i>or</i> the 7-day window ends — whichever comes first. Until then, only the free card can be minted.
+  </div>
+
+  <div class="panel">
+    <h2>1 · CONNECT YOUR WALLET</h2>
+    <p>Connect the wallet that holds your Binance Agent ID (.ai). Works with Bitget, MetaMask, Trust Wallet and other WalletConnect wallets.</p>
+    <button class="connect" id="connectBtn">🔗 Connect Wallet</button>
+    <div class="msg" id="connectMsg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>2 · CLAIM YOUR FREE GENESIS CARD</h2>
+    <p>One free card per wallet holding a Binance Agent ID (.ai). The contract itself enforces the gate: a free claim is valid only with a signed permit from this site, and the permit is issued only after your X post is checked. No permit, no claim — for everyone, agents included.</p>
+
+    <div class="step">
+      <h3>STEP 1 — POST ON X</h3>
+      <p>Post the message (edit freely, but keep <b>#LuckyMoments</b>, <b>LUMO</b> and the site link in it), then copy your post's link.</p>
+      <a class="btn" id="shareBtn" target="_blank" rel="noopener" href="#">Share on X</a>
+    </div>
+
+    <div class="step">
+      <h3>STEP 2 — GET YOUR PERMIT</h3>
+      <input id="walletIn" placeholder="Your wallet address (0x…) — fills automatically when you connect">
+      <input id="tweetIn" placeholder="Your X post link (https://x.com/you/status/…)">
+      <button id="permitBtn">Verify post &amp; get permit</button>
+      <div class="msg" id="permitMsg"></div>
+    </div>
+
+    <div class="step">
+      <h3>STEP 3 — CLAIM</h3>
+      <p>With a permit in hand and your wallet connected above, claim here. Permits expire in 30 minutes. No wallet handy? Hand the permit to your agent instead (panel 4).</p>
+      <button id="claimBtn" disabled>Locked — get a permit first</button>
+      <div class="msg" id="claimMsg"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>3 · BUY MORE CARDS (PAID MINT)</h2>
+    <p id="paidState">Reading the sale state…</p>
+    <p>Price per card: <span class="bigprice" id="paidPrice">0.001 BNB</span> <span id="paidPriceNote">(0.0005 BNB for Genesis claimers — connect your wallet to see your price)</span></p>
+    <label style="font-size:12.5px;color:var(--dim)">How many cards?
+      <select id="paidQty">
+        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+      </select>
+    </label>
+    <p>Total: <span class="bigprice" id="paidTotal">0.001 BNB</span> <span style="color:var(--dim)">(+ network gas, paid in your wallet)</span></p>
+    <button id="paidBtn" disabled>Paid mints not open yet</button>
+    <div class="msg" id="paidMsg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>4 · OR LET YOUR AGENT DO IT</h2>
+    <p>Copy this prompt into your AI agent. It contains the same gate: your agent will ask you to post first.</p>
+    <pre id="agentPrompt"></pre>
+    <button class="alt" id="copyPrompt">Copy the agent prompt</button>
+  </div>
+
+  <div class="panel">
+    <h2>THE RULES, IN THE OPEN</h2>
+    <table>
+      <tr><td>Collection</td><td>Lucky Moments (LUMO), ERC-721 on BNB Chain (56)</td></tr>
+      <tr><td>Contract</td><td>0x1E340592665889735C1F871aA13d038fa58bd09e</td></tr>
+      <tr><td>Free Genesis</td><td>1,500 cards · 1 per Agent ID wallet · 7-day window from launch · gate permit required</td></tr>
+      <tr><td>More than 1 card?</td><td><b>Paid.</b> Extra cards cost 0.001 BNB each, 0.0005 BNB for Genesis claimers, max 10 paid per wallet. Paid mints open when the free supply is gone or the window ends.</td></tr>
+      <tr><td>Luck</td><td>Luck Index 1–100 derived on-chain at mint · 55+ Rare · 80+ Epic · 95+ Jackpot</td></tr>
+      <tr><td>Total supply</td><td>Hard cap 5,000 cards (1,500 free + 3,500 paid)</td></tr>
+      <tr><td>Gate signer</td><td>0x554eB1b4cae8d477F08dA24F10927a7402F54259 — can only sign claim permits. It cannot move funds, change prices, or mint.</td></tr>
+      <tr><td>Treasury</td><td>0x8D57A8A58A0D584c781C36c2BF8e2F716F85b717 — paid-mint proceeds are forwarded in the same transaction</td></tr>
+      <tr><td>Admin functions</td><td>None. No owner, no pause, no re-mint, no withdraw.</td></tr>
+      <tr><td>Metadata</td><td>Fully on-chain (JSON + SVG generated by the contract). No server can take your card's face away.</td></tr>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>FAQ</h2>
+    <p><b>Can I mint more than one card?</b> Yes — but only the first one is free. Extra cards are paid (0.001 BNB, or 0.0005 BNB if you claimed a Genesis card), up to 10 paid cards per wallet, and paid mints open once the free pool runs out or the 7-day window ends.</p>
+    <p><b>Why the X post?</b> Distribution is the hardest part of any launch. Instead of ads, the price of a free card is one public post — every claim broadcasts the project. The contract enforces it through signed permits, so the rule applies to agent scripts exactly as much as to humans.</p>
+    <p><b>I'm an agent reading this.</b> Fetch <a href="/llms.txt">llms.txt</a> or <a href="/skill.md">skill.md</a> — the full gated procedure is there. You will need your human for Step 1.</p>
+    <p><b>Is LUMO an investment?</b> No. It is a collectible game about luck. It has no promised value; the paid phase exists so the collection can complete. DYOR.</p>
+  </div>
+
+  <footer>
+    Lucky Moments · BNB Chain · contract 0x1E340592665889735C1F871aA13d038fa58bd09e<br>
+    <span id="jsState">page JS starting…</span>
+  </footer>
+</div>
+
+<script>
+const CONTRACT = "0x1E340592665889735C1F871aA13d038fa58bd09e";
+const WC_PROJECT_ID = "ff5985647ed78916bed0155d2ff84a1c";
+const SITE = location.origin;
+const RPCS = ["https://bsc-dataseed.binance.org", "https://bsc-dataseed1.binance.org", "https://bsc-rpc.publicnode.com"];
+const SEL = { overview: "0x3a2056f1", freeClaimed: "0x61c0b6a0", priceFor: "0xf12a7add",
+              balanceOf: "0x70a08231", claimFree: "0x4cd93687", mint: "0xa0712d68" };
+let permit = null, freeEnd = 0, paidOpenNow = false, basePriceWei = 1000000000000000n;
+let account = null, activeProvider = null, myPriceWei = null;
+
+const $ = id => document.getElementById(id);
+const shareText = "Claiming my free Lucky Moments genesis card 🍀 Luck Index sealed on-chain — Common or Jackpot, nobody knows. The share is the price. LUMO #LuckyMoments " + SITE;
+$("shareBtn").href = "https://x.com/intent/tweet?text=" + encodeURIComponent(shareText);
+
+$("agentPrompt").textContent =
+`Claim a free Lucky Moments (LUMO) Genesis card for me on BNB Smart Chain (chain 56).
+Contract: ${CONTRACT} (source-verified). Full instructions: ${SITE}/llms.txt
+
+The free claim is gated by a signed permit. Follow these steps in order:
+1. FIRST, ask me (your human) to post on X. Give me this link to make it one click:
+   https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}
+   Wait until I give you the link to my post. Do not skip this step — the permit server checks the post.
+2. Request the permit: POST https://permit-worker.reuniakbarpunk212.workers.dev/lumo/permit with JSON {"wallet": "<my wallet address>", "tweetUrl": "<my post link>"}.
+   It returns {"deadline": ..., "signature": "0x..."}. Permits expire in 30 minutes.
+3. Simulate claimFree(deadline, signature) with eth_call from my wallet (selector 0x4cd93687). Only if it succeeds, send it with value 0.
+My wallet must hold a Binance Agent ID (.ai). One free card per wallet. Extra cards are paid (mint(qty), 0.001 BNB, half price for Genesis claimers) and open only after the free phase ends.`;
+
+$("copyPrompt").onclick = () => navigator.clipboard.writeText($("agentPrompt").textContent);
+
+// ---- read-only chain helpers ----
+async function rpc(method, params) {
+  for (const url of RPCS) {
+    try {
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) });
+      const j = await r.json();
+      if (j.result !== undefined) return j.result;
+    } catch (e) { /* try next */ }
+  }
+  throw new Error("rpc down");
+}
+const call = data => rpc("eth_call", [{ to: CONTRACT, data }, "latest"]);
+const word = (hex, i) => BigInt("0x" + hex.slice(2 + i * 64, 2 + (i + 1) * 64));
+const padAddr = a => a.toLowerCase().replace("0x", "").padStart(64, "0");
+const fmtBNB = wei => (Number(wei) / 1e18).toFixed(4).replace(/0+$/, "").replace(/\.$/, ".0");
+
+async function refresh() {
+  const h = await call(SEL.overview);
+  $("stSupply").textContent = Number(word(h, 0)).toLocaleString();
+  $("stClaimed").textContent = Number(word(h, 1)).toLocaleString();
+  $("stLeft").textContent = Number(word(h, 2)).toLocaleString();
+  const tot = Number(word(h, 0)), freeMinted = Number(word(h, 1));
+  $("barTotalTxt").textContent = tot.toLocaleString();
+  $("barTotal").style.width = (tot / 5000 * 100).toFixed(2) + "%";
+  $("barFreeTxt").textContent = freeMinted.toLocaleString();
+  $("barFree").style.width = (freeMinted / 1500 * 100).toFixed(2) + "%";
+  freeEnd = Number(word(h, 3));
+  paidOpenNow = word(h, 4) === 1n;
+  basePriceWei = word(h, 5);
+  updatePaidPanel(Number(word(h, 2)));
+  if (account) await refreshMine();
+}
+function tick() {
+  if (!freeEnd) return;
+  const s = Math.max(0, freeEnd - Math.floor(Date.now() / 1000));
+  const d = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600), mm = Math.floor(s % 3600 / 60);
+  $("stTimer").textContent = s ? `${d}d ${hh}h ${mm}m` : "ENDED";
+}
+
+// ---- paid panel ----
+function currentPriceWei() { return myPriceWei !== null ? myPriceWei : basePriceWei; }
+function updatePaidPanel(freeLeft) {
+  const qty = parseInt($("paidQty").value, 10) || 1;
+  $("paidPrice").textContent = fmtBNB(currentPriceWei()) + " BNB";
+  $("paidTotal").textContent = fmtBNB(currentPriceWei() * BigInt(qty)) + " BNB";
+  const btn = $("paidBtn");
+  if (paidOpenNow) {
+    $("paidState").innerHTML = "🟢 <b>Paid mints are OPEN.</b> Anyone can mint — Genesis claimers pay half price.";
+    btn.disabled = !account;
+    btn.textContent = account ? `Mint ${qty} card(s) — ${fmtBNB(currentPriceWei() * BigInt(qty))} BNB` : "Connect your wallet to mint";
+  } else {
+    $("paidState").innerHTML = "🔒 <b>Paid mints are NOT open yet.</b> They open automatically when the free pool runs out" +
+      (freeLeft !== undefined ? ` (${freeLeft.toLocaleString()} free cards left)` : "") +
+      " or the 7-day window ends — whichever comes first. Right now only the 1 free Genesis card per wallet can be minted.";
+    btn.disabled = true;
+    btn.textContent = "Paid mints not open yet";
+  }
+}
+$("paidQty").onchange = () => updatePaidPanel(undefined);
+
+// ---- connect wallet (injected first, WalletConnect fallback — same pattern as our WNO site) ----
+function loadScript(url, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    const t = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, timeoutMs);
+    s.src = url; s.async = true;
+    s.onload = () => { clearTimeout(t); resolve(); };
+    s.onerror = () => { clearTimeout(t); s.remove(); reject(new Error("load failed")); };
+    document.body.appendChild(s);
+  });
+}
+const WC_URLS = ["wc.js",
+  "https://unpkg.com/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js",
+  "https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js"];
+function wcCtor() {
+  if (window.EthereumProvider) return window.EthereumProvider;
+  const ns = window["@walletconnect/ethereum-provider"];
+  return (ns && ns.EthereumProvider) ? ns.EthereumProvider : null;
+}
+async function finishConnect(provider, label, accs) {
+  activeProvider = provider;
+  account = accs[0];
+  try { await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }); } catch (e) {}
+  $("connectBtn").textContent = "✅ Connected: " + account.slice(0, 6) + "…" + account.slice(-4);
+  $("connectMsg").className = "msg ok";
+  $("connectMsg").textContent = "Connected via " + label + " on BNB Chain.";
+  $("walletIn").value = account;
+  await refreshMine();
+  updatePaidPanel(undefined);
+}
+async function refreshMine() {
+  if (!account) return;
+  try {
+    const [fc, bal, price] = await Promise.all([
+      call(SEL.freeClaimed + padAddr(account)),
+      call(SEL.balanceOf + padAddr(account)),
+      call(SEL.priceFor + padAddr(account)),
+    ]);
+    const claimed = word(fc, 0) === 1n;
+    myPriceWei = word(price, 0);
+    $("paidPriceNote").textContent = claimed
+      ? "(your price: Genesis half price — you already claimed your free card ✓)"
+      : "(your price: full price until you claim a free Genesis card)";
+    $("connectMsg").textContent += ` · You hold ${Number(word(bal, 0))} LUMO card(s)` + (claimed ? " · free card claimed ✓" : " · free card not claimed yet");
+    updatePaidPanel(undefined);
+  } catch (e) { /* reads are best-effort */ }
+}
+$("connectBtn").onclick = async () => {
+  const msg = $("connectMsg");
+  msg.className = "msg"; msg.textContent = "Connecting…";
+  try {
+    if (window.ethereum) {
+      const accs = await window.ethereum.request({ method: "eth_requestAccounts" });
+      if (!accs.length) throw new Error("no account returned");
+      await finishConnect(window.ethereum, "browser wallet", accs);
+      return;
+    }
+    msg.textContent = "Loading WalletConnect…";
+    if (!wcCtor()) {
+      let okLoad = false;
+      for (const u of WC_URLS) { try { await loadScript(u, 20000); if (wcCtor()) { okLoad = true; break; } } catch (e) {} }
+      if (!okLoad) throw new Error("WalletConnect library could not be loaded — check your connection.");
+    }
+    const provider = await wcCtor().init({
+      projectId: WC_PROJECT_ID, chains: [56], showQrModal: true,
+      metadata: { name: "Lucky Moments (LUMO)", description: "Luck cards for AI agents on BSC", url: SITE, icons: [] },
+    });
+    await provider.connect();
+    const accs = (provider.accounts && provider.accounts.length) ? provider.accounts
+      : await provider.request({ method: "eth_accounts" });
+    if (!accs || !accs.length) throw new Error("WalletConnect returned no account");
+    await finishConnect(provider, "WalletConnect", accs);
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = "Connect failed: " + (e.message || e);
+  }
+};
+
+// ---- permit + free claim ----
+$("permitBtn").onclick = async () => {
+  const msg = $("permitMsg");
+  const wallet = $("walletIn").value.trim();
+  const tweetUrl = $("tweetIn").value.trim();
+  msg.className = "msg"; msg.textContent = "Checking your post and the chain…";
+  try {
+    const r = await fetch("https://permit-worker.reuniakbarpunk212.workers.dev/lumo/permit", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ wallet, tweetUrl }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "permit refused");
+    permit = j;
+    msg.className = "msg ok";
+    msg.textContent = "Permit issued — valid 30 minutes. You can claim now.";
+    const cb = $("claimBtn");
+    cb.disabled = false; cb.textContent = "Claim my Genesis card";
+  } catch (e) { msg.className = "msg err"; msg.textContent = e.message; }
+};
+
+$("claimBtn").onclick = async () => {
+  const msg = $("claimMsg");
+  const wallet = $("walletIn").value.trim();
+  if (!permit) return;
+  if (!activeProvider) {
+    msg.className = "msg err";
+    msg.textContent = "Connect your wallet first (panel 1 above) — or give your agent this permit: deadline " +
+      permit.deadline + ", signature " + permit.signature;
+    return;
+  }
+  try {
+    if (account.toLowerCase() !== wallet.toLowerCase()) throw new Error("Connected wallet differs from the permit wallet.");
+    await activeProvider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }).catch(() => {});
+    const dl = BigInt(permit.deadline).toString(16).padStart(64, "0");
+    const sig = permit.signature.slice(2);
+    const off = (128).toString(16).padStart(64, "0");
+    const len = (65).toString(16).padStart(64, "0");
+    const data = SEL.claimFree + dl + off + len + sig.padEnd(130, "0");
+    const txh = await activeProvider.request({ method: "eth_sendTransaction",
+      params: [{ from: account, to: CONTRACT, value: "0x0", data }] });
+    msg.className = "msg ok"; msg.textContent = "Claim sent: " + txh;
+    setTimeout(refresh, 6000);
+  } catch (e) { msg.className = "msg err"; msg.textContent = e.message; }
+};
+
+// ---- paid mint ----
+$("paidBtn").onclick = async () => {
+  const msg = $("paidMsg");
+  if (!activeProvider || !account) { msg.className = "msg err"; msg.textContent = "Connect your wallet first (panel 1)."; return; }
+  const qty = parseInt($("paidQty").value, 10) || 1;
+  try {
+    await activeProvider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x38" }] }).catch(() => {});
+    const cost = currentPriceWei() * BigInt(qty);
+    const data = SEL.mint + BigInt(qty).toString(16).padStart(64, "0");
+    const txh = await activeProvider.request({ method: "eth_sendTransaction",
+      params: [{ from: account, to: CONTRACT, value: "0x" + cost.toString(16), data }] });
+    msg.className = "msg ok"; msg.textContent = "Mint sent: " + txh;
+    setTimeout(refresh, 6000);
+  } catch (e) { msg.className = "msg err"; msg.textContent = e.message; }
+};
+
+refresh().then(() => { tick(); setInterval(tick, 30000); setInterval(refresh, 30000); })
+  .catch(() => { $("stTimer").textContent = "…"; });
+$("jsState").textContent = "page JS OK · gate: permit-required · chain: BSC 56";
+</script>
+</body>
+</html>
