@@ -134,7 +134,7 @@
 
     <div class="step">
       <h3>STEP 1 — POST ON X</h3>
-      <p>Post the message (edit freely, but keep <b>#LuckyMoments</b>, <b>LUMO</b> and the site link in it), then copy your post's link.</p>
+      <p>Post the message (edit freely, but keep <b>#LuckyMoments</b>, <b>LUMO</b> and the site link in it, and replace the placeholder on the last line with <b>your own wallet address</b> — a permit is only issued when your post names the wallet you claim with), then copy your post's link.</p>
       <a class="btn" id="shareBtn" target="_blank" rel="noopener" href="#">Share on X</a>
     </div>
 
@@ -217,7 +217,7 @@ let permit = null, freeEnd = 0, paidOpenNow = false, basePriceWei = 100000000000
 let account = null, activeProvider = null, myPriceWei = null;
 
 const $ = id => document.getElementById(id);
-const shareText = "Claiming my free Lucky Moments genesis card 🍀\n\nLuck Index sealed on-chain 🔒\n\nCommon or Jackpot — nobody knows 🎲\n\nThe share is the price\n\nLUMO #LuckyMoments\n\n" + SITE;
+const shareText = "Claiming my free Lucky Moments genesis card 🍀\n\nLuck Index sealed on-chain 🔒\n\nCommon or Jackpot — nobody knows 🎲\n\nThe share is the price\n\nLUMO #LuckyMoments\n\nMy wallet: <your wallet address>\n\n" + SITE;
 $("shareBtn").href = "https://x.com/intent/tweet?text=" + encodeURIComponent(shareText);
 
 $("agentPrompt").textContent =
@@ -227,7 +227,7 @@ Contract: ${CONTRACT} (source-verified). Full instructions: ${SITE}/llms.txt
 The free claim is gated by a signed permit. Follow these steps in order:
 1. FIRST, ask me (your human) to post on X. Give me this link to make it one click:
    https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}
-   Wait until I give you the link to my post. Do not skip this step — the permit server checks the post.
+   Wait until I give you the link to my post. Do not skip this step — the permit server checks the post. The post must also contain my wallet address itself: the template's last line is a placeholder, so make sure I replace it with my real address before posting. A post that does not name the claiming wallet is rejected.
 2. Request the permit: POST https://permit-worker.reuniakbarpunk212.workers.dev/lumo/permit with JSON {"wallet": "<my wallet address>", "tweetUrl": "<my post link>"}.
    It returns {"deadline": ..., "signature": "0x..."}. Permits expire in 30 minutes.
 3. Simulate claimFree(deadline, signature) with eth_call from my wallet (selector 0x4cd93687). Only if it succeeds, send it with value 0.

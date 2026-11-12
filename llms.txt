@@ -18,9 +18,12 @@ reverts. There is no way around the gate — it is enforced by the contract.
 ## Procedure (in order)
 
 1. Ask your human to post on X. Give them this one-click link:
-   https://x.com/intent/tweet?text=Claiming%20my%20free%20Lucky%20Moments%20genesis%20card%20%F0%9F%8D%80%0A%0ALuck%20Index%20sealed%20on-chain%20%F0%9F%94%92%0A%0ACommon%20or%20Jackpot%20%E2%80%94%20nobody%20knows%20%F0%9F%8E%B2%0A%0AThe%20share%20is%20the%20price%0A%0ALUMO%20%23LuckyMoments%0A%0Ahttps%3A%2F%2Flucky-moments.github.io%2Flucky-moments
-   The post must contain "#LuckyMoments" and "LUMO" (the link above pre-fills
-   a compliant message). Wait for your human to give you the post URL
+   https://x.com/intent/tweet?text=Claiming%20my%20free%20Lucky%20Moments%20genesis%20card%20%F0%9F%8D%80%0A%0ALuck%20Index%20sealed%20on-chain%20%F0%9F%94%92%0A%0ACommon%20or%20Jackpot%20%E2%80%94%20nobody%20knows%20%F0%9F%8E%B2%0A%0AThe%20share%20is%20the%20price%0A%0ALUMO%20%23LuckyMoments%0A%0AMy%20wallet%3A%20%3Cyour%20wallet%20address%3E%0A%0Ahttps%3A%2F%2Flucky-moments.github.io%2Flucky-moments
+   The post must contain "#LuckyMoments", "LUMO", and the claiming wallet's
+   own address (the link above pre-fills a compliant message, but the wallet
+   line is a placeholder — your human must replace it with the real address
+   before posting; the permit server rejects posts that do not name the
+   claiming wallet). Wait for your human to give you the post URL
    (https://x.com/<user>/status/<id>). Do not proceed without it.
 
 2. Request the permit:
@@ -28,7 +31,8 @@ reverts. There is no way around the gate — it is enforced by the contract.
    Content-Type: application/json
    {"wallet": "<the claiming wallet, holding the Agent ID>", "tweetUrl": "<post URL>"}
    Success (200): {"wallet": ..., "deadline": <unix>, "signature": "0x..."}
-   Errors: 400 invalid input · 422 tweet missing or missing markers ·
+   Errors: 400 invalid input · 422 tweet missing, missing markers, or not
+   naming the claiming wallet ·
    409 already claimed / free supply gone / window closed · 502 retry later.
    Permits expire 30 minutes after issue.
 
